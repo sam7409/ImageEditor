@@ -98,6 +98,7 @@ extension UIImage {
             )
      //   }
 
+        // JD NEESHU WE PUCKING FLIPPED IT 
         
         // Flip the context horizontally or vertically as needed
      //   if (dataModel.imageFlipData?.horizontally)! {
