@@ -17,17 +17,18 @@ class EditorVM{
     }
     func setAngle(rotationAngle: CGFloat){
         dataModel?.imageFlipData?.radian = rotationAngle
-        print(dataModel?.imageFlipData?.radian as Any)
         
+    }
+    func setScaledWidthNHeight(scale: CGFloat){
+        dataModel?.width = (dataModel?.width)! * scale
+        dataModel?.height = (dataModel?.height)! * scale
     }
     func setScale(scale: CGFloat){
         dataModel?.scale = scale
-        print(scale)
     }
     func setCenter(center : CGPoint){
         dataModel?.centerX = center.x
         dataModel?.centerY = center.y
-        print(center)
     }
     //This func used to get the image
     func getImage()->UIImage{
@@ -87,7 +88,7 @@ class EditorVM{
         let placeHolderFrame = calculateViewFrame(size: size, aspectRatio: aspectRatio)
         dataModel?.referenceSize = placeHolderFrame.size
         if let referenceSize = dataModel?.referenceSize{
-             imageViewFrame = calculateViewFrame(size:  referenceSize, aspectRatio: getImageAspectratio())
+            imageViewFrame = calculateImageViewFrame(size:  referenceSize, aspectRatio: getImageAspectratio(), scale: (dataModel?.scale)!)
             dataModel?.width = imageViewFrame.width
             dataModel?.height = imageViewFrame.height
             dataModel?.centerX = referenceSize.width/2
@@ -107,7 +108,6 @@ class EditorVM{
         dataModel?.height = size.height
     }
     func updateFlipNRotate(model : ImageFlipModel?){
-        dataModel?.imageFlipData = model
         onBinderDidFlipNRotationModelChanged!(model)
     }
     
@@ -127,6 +127,24 @@ class EditorVM{
        
         
         return CGRect(x: originX, y: originY, width: viewWidth, height: viewHeight)
+    }
+    
+    func calculateImageViewFrame(size: CGSize , aspectRatio: CGFloat, scale: CGFloat) -> CGRect {
+        var viewWidth = size.width
+        var viewHeight = size.width / aspectRatio
+        
+        // If the calculated height exceeds the parent height, adjust the height and width
+        if viewHeight > size.height {
+            viewHeight = size.height
+            viewWidth = viewHeight * aspectRatio
+        }
+        
+        let originX = (size.width - viewWidth * scale) / 2
+        let originY = (size.height - viewHeight * scale) / 2
+        
+       
+        
+        return CGRect(x: originX, y: originY, width: viewWidth * scale, height: viewHeight * scale)
     }
     
     // Creates the OpacityNRatioVM

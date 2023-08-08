@@ -5,6 +5,8 @@ class EditorVC: UIViewController{
     @IBOutlet var opacityRatioView: UIView!
     
     @IBOutlet var handyView: UIView!
+    @IBOutlet var tabBarPlaceHolder: UIView!
+    
     var viewModel : EditorVM
     var imageView : UIImageView?
     var opacityNRatioVC : OpacityNRatioVC?
@@ -16,6 +18,7 @@ class EditorVC: UIViewController{
     var lastRotation: CGFloat = 0.0
     var flipNRotationVC : FlipNRotationVC?
     var borderPanelVC : BorderPanelVC?
+    var tabBarView : UIView?
     init(viewModel: EditorVM) {
         self.viewModel = viewModel
         super.init(nibName: "EditorVC", bundle: nil)
@@ -29,56 +32,124 @@ class EditorVC: UIViewController{
         createBackgroundView()
         createImageView()
         activateBinder()
-        DispatchQueue.main.async { [self] in
-            viewModel.setReferenceSize(size: placeHolder.frame.size, aspectRatio: viewModel.getAspectRatio())
-        }
-
         originalCenter = imageView!.center
         tapGestureOnimage()
         pinchGestureOnImage()
         panGestureOnImage()
         addRotationGesture()
         createSaveButtonOnNavigationBar()
-        createAllVC()
-        createTabBarController()
+        createTabBarView(index: 0)
     }
-    func createTabBarController(){
-        // Customize tab bar items for each view controller
-        flipNRotationVC?.tabBarItem = UITabBarItem()
-        flipNRotationVC?.tabBarItem.title = "TP"
-        opacityNRatioVC?.tabBarItem = UITabBarItem()
-        opacityNRatioVC?.tabBarItem.title = "ORP"
-        borderPanelVC?.tabBarItem = UITabBarItem()
-        borderPanelVC?.tabBarItem.title = "BP"
-        
-        // Create a tab bar controller
-        let tabBarController = UITabBarController()
-        
-        // Add your view controllers to the tab bar controller
-       tabBarController.viewControllers = [flipNRotationVC!, opacityNRatioVC!, borderPanelVC!]
-        
-        // Customize the appearance of the tab bar items (increase the font size)
-        let tabBarFont = UIFont.systemFont(ofSize: 18) // Change the font size as desired
-        let attributes = [NSAttributedString.Key.font: tabBarFont]
-        tabBarController.tabBar.items?.forEach { item in
-            item.setTitleTextAttributes(attributes, for: .normal)
+    
+    override func viewWillLayoutSubviews() {
+        DispatchQueue.main.async { [self] in
+            viewModel.setReferenceSize(size: placeHolder.frame.size, aspectRatio: viewModel.getAspectRatio())
         }
-
-        // Add the tab bar controller as a child view controller
-        addChild(tabBarController)
-
-         // Add the tab bar controller's view to your current view controller's view
-        opacityRatioView.addSubview(tabBarController.view)
-
-         // Set the tab bar controller's view frame to fill your current view controller's view
-         tabBarController.view.frame = opacityRatioView.bounds
-
-       // Finish adding the tab bar controller as a child view controller
-       tabBarController.didMove(toParent: self)
+        print(viewModel.dataModel?.width)
+        print(viewModel.dataModel?.height)
+        print(viewModel.dataModel?.scale)
     }
+    
+    func createTabBarView(index: Int) {
+        // Create a view to serve as the container for the buttons
+        tabBarView = UIView(frame: CGRect(x: 0, y: 162, width: view.frame.width, height: 50))
+        tabBarView!.backgroundColor = UIColor(named: "PrimaryColor") // Customize the background color as desired
+
+        // Create buttons for each view
+        let transformButton = UIButton(type: .system)
+        transformButton.tintColor = UIColor(named: "ThemeColor")
+        transformButton.setTitle("Transform", for: .normal)
+        transformButton.addTarget(self, action: #selector(showTransformView), for: .touchUpInside)
+        tabBarView!.addSubview(transformButton)
+
+        let resizeButton = UIButton(type: .system)
+        resizeButton.tintColor = UIColor(named: "ThemeColor")
+        resizeButton.setTitle("Resize", for: .normal)
+        resizeButton.addTarget(self, action: #selector(showResizeView), for: .touchUpInside)
+        tabBarView!.addSubview(resizeButton)
+
+        let borderButton = UIButton(type: .system)
+        borderButton.tintColor = UIColor(named: "ThemeColor")
+        borderButton.setTitle("Border", for: .normal)
+        borderButton.addTarget(self, action: #selector(showBorderView), for: .touchUpInside)
+        tabBarView!.addSubview(borderButton)
+
+        // Layout the buttons horizontally
+        let buttonWidth = tabBarView!.frame.width / 3
+        transformButton.frame = CGRect(x: 0, y: 0, width: buttonWidth, height: tabBarView!.frame.height)
+        resizeButton.frame = CGRect(x: buttonWidth, y: 0, width: buttonWidth, height: tabBarView!.frame.height)
+        borderButton.frame = CGRect(x: buttonWidth * 2, y: 0, width: buttonWidth, height: tabBarView!.frame.height)
+
+        // Add the tabBarView to your current view controller's view
+        opacityRatioView.addSubview(tabBarView!)
+
+        // Optionally, you can set the selected view index (e.g., to highlight the initial view)
+        // You'll need to keep track of the selected index yourself as you switch views.
+        // For simplicity, I'm showing a single variable `selectedIndex`.
+       // selectedIndex = index
+    }
+
+    func addOverlay() {
+        let overlayView = UIView(frame: opacityRatioView.bounds)
+        overlayView.backgroundColor = UIColor(named: "SecondaryColor")!.withAlphaComponent(1.0) // Customize the opacity of the overlay as desired
+        opacityRatioView.addSubview(overlayView)
+    }
+
+    func removeOverlay() {
+        for subview in opacityRatioView.subviews {
+            if subview is UIView && subview != tabBarView {
+                subview.removeFromSuperview()
+            }
+        }
+    }
+
+    @objc func showResizeView() {
+        addOverlay()
+        // Present the view you want to show when the "Transform" button is tapped
+        let opcityNRatioVM = viewModel.createOpacityNRatioVM()
+        opacityNRatioVC = OpacityNRatioVC(viewModel: opcityNRatioVM)// Replace with your Transform view controller
+        addChild(opacityNRatioVC!)
+        opacityNRatioVC!.view.frame = opacityRatioView.bounds
+        opacityRatioView.addSubview(opacityNRatioVC!.view)
+        opacityNRatioVC!.didMove(toParent: self)
+        opacityNRatioVC?.editorDelegate = self
+    }
+
+    @objc func showTransformView() {
+        addOverlay()
+        
+        // Present the view you want to show when the "Resize" button is tapped
+        let flipNRotationVM = viewModel.createFlipNRotationVM()
+        flipNRotationVC = FlipNRotationVC(viewModel: flipNRotationVM)// Replace with your Resize view controller
+        addChild(flipNRotationVC!)
+        flipNRotationVC!.view.frame = opacityRatioView.bounds
+        opacityRatioView.addSubview(flipNRotationVC!.view)
+        flipNRotationVC!.didMove(toParent: self)
+        flipNRotationVC?.flipNRotaionDelegate = self
+    }
+
+    @objc func showBorderView() {
+        addOverlay()
+        
+        // Present the view you want to show when the "Border" button is tapped
+        let borderPanelVM = viewModel.createBorderPanelVM()
+        borderPanelVC = BorderPanelVC(dataModel: borderPanelVM) // Replace with your Border view controller
+        addChild(borderPanelVC!)
+        borderPanelVC!.view.frame = opacityRatioView.bounds
+        opacityRatioView.addSubview(borderPanelVC!.view)
+        borderPanelVC!.didMove(toParent: self)
+        borderPanelVC?.borderPanelDelegate = self
+    }
+
+    // Implement this function in your presented view controllers to handle the "Done" button.
+    // When the "Done" button is tapped, the presented view will be removed from the parent view controller, and the overlay will be removed.
+    @objc func doneButtonTapped() {
+        removeOverlay()
+    }
+
+    
     func createBackgroundView(){
         backgroundView = UIView()
-        backgroundView?.backgroundColor = .systemPink
         backgroundView!.frame = CGRect(x: 0, y: 0, width: 400, height: 400)
         placeHolder.addSubview(backgroundView!)
         backgroundView!.clipsToBounds = true
@@ -90,20 +161,48 @@ class EditorVC: UIViewController{
         imageView?.frame = CGRect(x: 0, y: 0, width: 400, height: 400)
         imageView!.image = viewModel.getImage()
         imageView?.backgroundColor = .white
+        backgroundView?.backgroundColor = UIColor(named: "DefaultColor")
         backgroundView!.addSubview(imageView!)
     }
     //MARK: -Create Save Button on Navigation Bar
     func createSaveButtonOnNavigationBar(){
         // Create a custom UIBarButtonItem with a title
         let saveButton = UIBarButtonItem(title: "Save", style: .plain, target: self, action: #selector(SaveButton))
-        saveButton.tintColor = .black
+        saveButton.tintColor = UIColor(named: "ThemeColor")
         // Add the UIBarButtonItem to the right side of the navigation bar
         navigationItem.rightBarButtonItem = saveButton
     }
     
     @objc func SaveButton() {
         savePhotoToGallery(dataModel: viewModel.dataModel!)
+//        showPrompt()
     }
+    
+    //MARK: - Save photo in gallery function.
+    func savePhotoToGallery(dataModel: AppModel) {
+        var flippedImage = dataModel.image!
+        if(dataModel.imageFlipData!.horizontally){
+            flippedImage = flippedImage.imageFlippedHorizontally(dataModel.imageFlipData!.horizontally)
+        }
+        if(dataModel.imageFlipData!.vertically){
+            flippedImage = flippedImage.imageFlippedVertically(dataModel.imageFlipData!.vertically)
+        }
+        let adjustedImageWithAspectRatio = flippedImage.drawOnContext(dataModel: dataModel, contextSize: CGSize(width: 1000, height: 1000))
+        // Save the adjusted image to the Camera Roll
+        shareImage(image: adjustedImageWithAspectRatio!)
+    //    UIImageWriteToSavedPhotosAlbum(adjustedImageWithAspectRatio!, nil, nil, nil)
+    }
+    func shareImage(image: UIImage) {
+       let activityViewController = UIActivityViewController(activityItems: [image], applicationActivities: nil)
+
+       // Exclude specific activities if needed (e.g., AirDrop)
+       activityViewController.excludedActivityTypes = [UIActivity.ActivityType.airDrop]
+
+       // Present the activity view controller
+        self.present(activityViewController, animated: true, completion: nil)
+    }
+    
+    
     //MARK: - End of Save Button
     
     //MARK: - Tap Gesture Implementation
@@ -114,7 +213,7 @@ class EditorVC: UIViewController{
         imageView?.isUserInteractionEnabled = true
     }
     @objc private func handleTapEvent(){
-        
+        originalScale = (viewModel.dataModel?.scale)!
         imageView?.transform = CGAffineTransform(scaleX: originalScale, y: originalScale)
         imageView?.center = originalCenter
         viewModel.setCenter(center: originalCenter)
@@ -152,7 +251,8 @@ class EditorVC: UIViewController{
                   transform = transform.scaledBy(x: viewModel.dataModel!.imageFlipData!.horizontally ? -1 : 1 , y: viewModel.dataModel!.imageFlipData!.vertically ? -1 : 1)
                   imageView?.transform = transform
                   viewModel.setScale(scale: clampedScale)
-                  
+                  viewModel.setScaledWidthNHeight(scale: clampedScale)
+
               }
               else if gestureRecognizer.state == .ended {
                   // Save the current scale for future use
@@ -217,51 +317,6 @@ class EditorVC: UIViewController{
     }
     //MARK: -END Rotation Gesture
     
-    func createAllVC(){
-        let opcityNRatioVM = viewModel.createOpacityNRatioVM()
-        opacityNRatioVC = OpacityNRatioVC(viewModel: opcityNRatioVM)
-        opacityNRatioVC?.editorDelegate = self
-        let flipNRotationVM = viewModel.createFlipNRotationVM()
-        flipNRotationVC = FlipNRotationVC(viewModel: flipNRotationVM)
-        flipNRotationVC?.flipNRotaionDelegate = self
-        let borderPanelVM = viewModel.createBorderPanelVM()
-        borderPanelVC = BorderPanelVC(dataModel: borderPanelVM)
-        borderPanelVC?.borderPanelDelegate = self
-        
-    }
-//    func addORPanelToVC(){
-//        opacityRatioView.addSubview((opacityNRatioVC?.view)!)
-//        opacityNRatioVC!.didMove(toParent: self)
-//        opacityNRatioVC!.view.frame = CGRect(x: 0, y: 0, width: opacityRatioView.frame.width, height: opacityRatioView.frame.height)
-//        opacityNRatioVC?.editorDelegate = self
-//    }
-//
-//    func AddTransformationPanelToVC(){
-//        opacityRatioView.addSubview((flipNRotationVC?.view)!)
-//        flipNRotationVC!.didMove(toParent: self)
-//        flipNRotationVC!.view.frame = CGRect(x: 0, y: 0, width: opacityRatioView.frame.width, height: opacityRatioView.frame.height)
-//        flipNRotationVC?.flipNRotaionDelegate = self
-//    }
-//
-//    func AddBorderPanelToVC(){
-//        opacityRatioView.addSubview((borderPanelVC?.view)!)
-//        borderPanelVC!.didMove(toParent: self)
-//        borderPanelVC!.view.frame = CGRect(x: 0, y: 0, width: opacityRatioView.frame.width, height: opacityRatioView.frame.height)
-//        borderPanelVC?.borderPanelDelegate = self
-//    }
-    
-//    @IBAction func goToOpacityNRatioView(_ sender: Any) {
-//        addORPanelToVC()
-//    }
-//
-//    @IBAction func goToFlipNRotationView(_ sender: Any) {
-//        AddTransformationPanelToVC()
-//    }
-//
-//    @IBAction func goToBorderPanelView(_ sender: Any) {
-//        AddBorderPanelToVC()
-//    }
-    
     //MARK: - All Binder Activation Function
     func activateBinder(){
         viewModel.onBinderDidFrameChanged = { frame in
@@ -271,11 +326,9 @@ class EditorVC: UIViewController{
             imageView?.alpha = opacity
         }
         viewModel.onBindAspectRatio = { [self] aspectRatio in
-            print(aspectRatio as Any)
             viewModel.setReferenceSize(size: (placeHolder?.frame.size)!, aspectRatio: aspectRatio!)
         }
         viewModel.onBindOpacity = { opacity in
-            print(opacity as Any)
         }
         viewModel.onBinderDidPlaceholderFrameChanged = { [self] frame in
             backgroundView!.frame = frame
@@ -284,16 +337,30 @@ class EditorVC: UIViewController{
             imageView?.frame = frame
         }
         viewModel.onBinderDidFlipNRotationModelChanged = { [self] model in
-            imageView!.transform = CGAffineTransform(rotationAngle: model!.radian)
-            
+
             if (model?.horizontally == true || model?.vertically == true) {
                 let flippedHorizontally = model?.horizontally ?? false
                 let flippedVertically = model?.vertically ?? false
-                
+
                 let scaleX: CGFloat = flippedHorizontally ? -1.0 : 1.0
                 let scaleY: CGFloat = flippedVertically ? -1.0 : 1.0
+                // Reset the imageView's transform to the identity transform (original state)
+                imageView?.transform = CGAffineTransform.identity
+                var transform = CGAffineTransform(scaleX:  (viewModel.dataModel?.scale)!, y:  (viewModel.dataModel?.scale)!)
+                transform = transform.scaledBy(x: scaleX, y: scaleY)
+                transform = transform.rotated(by: model!.radian)
+                imageView?.transform = transform
+                imageView?.center = CGPoint(x: (viewModel.dataModel?.centerX)!, y: (viewModel.dataModel?.centerY)!)
+            }
+
+            else{
+                // Reset the imageView's transform to the identity transform (original state)
+                imageView?.transform = CGAffineTransform.identity
+                var transform = CGAffineTransform(scaleX: (viewModel.dataModel?.scale)!, y:  (viewModel.dataModel?.scale)!)
+                transform = transform.scaledBy(x: viewModel.dataModel!.imageFlipData!.horizontally ? -1 : 1 , y: viewModel.dataModel!.imageFlipData!.vertically ? -1 : 1)
+                transform = transform.rotated(by: model!.radian)
+                imageView?.transform = transform
                 
-                imageView!.transform = imageView!.transform.scaledBy(x: scaleX, y: scaleY)
             }
         }
         viewModel.onBinderDidBorderPanelModelChanged = { [self] model in
@@ -310,22 +377,12 @@ extension EditorVC : EditorDelegate{
         viewModel.updateOpacityNRatio(model : model)
     }
     func didORViewDismissWithoutData() {
-//        if let childVC = opacityNRatioVC {
-//            childVC.willMove(toParent: nil)
-//            childVC.view.removeFromSuperview()
-//            childVC.removeFromParent()
-//            opacityNRatioVC = nil // Reset the reference to the child view controller
-//        }
         viewModel.updateOpacityNRatio(model : viewModel.getOpacityNRatioDataModel())
+        doneButtonTapped()
     }
     func didORViewDismissWithData(model: OpacityRatioModel) {
         viewModel.updateOpacityNRatioModel(model : model)
-//        if let childVC = opacityNRatioVC {
-//            childVC.willMove(toParent: nil)
-//            childVC.view.removeFromSuperview()
-//            childVC.removeFromParent()
-//            opacityNRatioVC = nil // Reset the reference to the child view controller
-//        }
+        doneButtonTapped()
     }
 }
 //MARK: - FlipNRotation Delegate Func Implementation
@@ -333,26 +390,18 @@ extension EditorVC : FlipNRotationDelegate{
     func didFlipNRitationModelChange(model: ImageFlipModel) {
         viewModel.updateFlipNRotate(model: model)
     }
+    
     func didTransformViewDismissWithData(model: ImageFlipModel) {
         viewModel.updateFlipNRotationModel(model: model)
-//        if let childVC = flipNRotationVC {
-//            childVC.willMove(toParent: nil)
-//            childVC.view.removeFromSuperview()
-//            childVC.removeFromParent()
-//            flipNRotationVC = nil // Reset the reference to the child view controller
-//        }
+        doneButtonTapped()
     }
     
     func didTransformViewDismissWithoutData(){
-//        if let childVC = flipNRotationVC {
-//            childVC.willMove(toParent: nil)
-//            childVC.view.removeFromSuperview()
-//            childVC.removeFromParent()
-//            flipNRotationVC = nil // Reset the reference to the child view controller
-//        }
         let model = viewModel.dataModel?.imageFlipData
         viewModel.updateFlipNRotate(model: model!)
+        doneButtonTapped()
     }
+
 }
 
 //MARK: - BorderPanelDelegate Delegate Func Implementation
@@ -361,22 +410,12 @@ extension EditorVC : BorderPanelDelegate{
         viewModel.updateBorderWidthNColor(model: model)
     }
     func didBorderPanelViewDismissWithoutData() {
-//        if let childVC = borderPanelVC {
-//            childVC.willMove(toParent: nil)
-//            childVC.view.removeFromSuperview()
-//            childVC.removeFromParent()
-//            borderPanelVC = nil // Reset the reference to the child view controller
-//        }
         viewModel.updateBorderWidthNColor(model: viewModel.getBorderPanelDataModel())
+        doneButtonTapped()
     }
     
     func didBorderPanelViewDismissWithData(model: BorderPanelModel) {
         viewModel.updateBorderPanelModel(model: model)
-//        if let childVC = borderPanelVC {
-//            childVC.willMove(toParent: nil)
-//            childVC.view.removeFromSuperview()
-//            childVC.removeFromParent()
-//            borderPanelVC = nil // Reset the reference to the child view controller
-//        }
+        doneButtonTapped()
     }
 }

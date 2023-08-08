@@ -1,9 +1,15 @@
 import UIKit
 class OpacityNRatioVM{
+    var prevDataModel: OpacityRatioModel
     var dataModel : OpacityRatioModel
     var onBindOpacity : ((CGFloat?)->())?
     init(dataModel: OpacityRatioModel) {
         self.dataModel = dataModel
+        self.prevDataModel = dataModel
+    }
+    func updateCurrentModelToPreviousModel(){
+        dataModel = prevDataModel
+        onBindOpacity!(dataModel.opacity)
     }
     func getModelData()->OpacityRatioModel{
         return dataModel

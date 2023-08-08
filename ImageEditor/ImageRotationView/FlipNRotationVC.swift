@@ -1,10 +1,3 @@
-//
-//  RotationSliderView.swift
-//  ImageEditor
-//
-//  Created by HIMANSHU SINGH on 31/07/23.
-//
-
 import UIKit
 
 class FlipNRotationVC: UIViewController {
@@ -18,7 +11,8 @@ class FlipNRotationVC: UIViewController {
     @IBOutlet var cancelButton: UIButton!
     
     @IBOutlet var doneButton: UIButton!
-    
+    @IBOutlet var minSliderLabel: UILabel!
+
     var viewModel : FlipNRotationVM?
     var flipNRotaionDelegate : FlipNRotationDelegate?
     init(viewModel: FlipNRotationVM? = nil) {
@@ -33,15 +27,17 @@ class FlipNRotationVC: UIViewController {
         super.viewDidLoad()
         rotationSlider.value = Float((viewModel?.getRotaionRadian())!)
         rotationSlider.minimumValue = 0.0
-        rotationSlider.maximumValue = 12.0
+        rotationSlider.maximumValue = 6.28
         horizontalFlipButton.layer.cornerRadius = 12
         verticalFlipButton.layer.cornerRadius = 12
         cancelButton.layer.cornerRadius = 10
         doneButton.layer.cornerRadius = 10
+        minSliderLabel.text = "0.0"
+        activateBinder()
     }
     
     @IBAction func didChangeHorizontalFlip(_ sender: Any) {
-        var bool = viewModel!.getHorizontalFlip()
+        let bool = viewModel!.getHorizontalFlip()
         if(bool){
             viewModel?.updateHorizontalFlip(bool: false)
 
@@ -53,7 +49,7 @@ class FlipNRotationVC: UIViewController {
     }
     
     @IBAction func didChangeVerticalFlip(_ sender: Any) {
-        var bool = viewModel!.getVerticallyFlip()
+        let bool = viewModel!.getVerticallyFlip()
         if(bool){
             viewModel?.updateVerticalFlip(bool: false)
         }
@@ -68,17 +64,24 @@ class FlipNRotationVC: UIViewController {
         rotateImage(angle: CGFloat(angle))
     }
     func rotateImage(angle: CGFloat) {
-        let radians = angle * CGFloat.pi / 180.0
-        viewModel?.updateRotation(radian: radians)
+        viewModel?.updateRotation(radian: CGFloat(rotationSlider.value))
         flipNRotaionDelegate?.didFlipNRitationModelChange(model: (viewModel?.getDataModel())!)
 
     }
     
     @IBAction func didCancelButtonClicked(_ sender: Any) {
+        viewModel!.updateCurrentModelToPreviousModel()
         flipNRotaionDelegate?.didTransformViewDismissWithoutData()
     }
     
     @IBAction func didDoneButtonClicked(_ sender: Any) {
         flipNRotaionDelegate?.didTransformViewDismissWithData(model: viewModel!.getDataModel())
+    }
+    func activateBinder(){
+        viewModel?.onBindRotation = { [self] radian in
+            rotationSlider.value = Float(radian!)
+            let  degree = radian! * (180.0 / .pi)
+            self.minSliderLabel.text =  String(format: "%.2f", Float(degree))
+        }
     }
 }

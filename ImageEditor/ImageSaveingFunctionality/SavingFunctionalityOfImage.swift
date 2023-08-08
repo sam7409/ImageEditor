@@ -1,15 +1,27 @@
 import UIKit
+import CoreImage
 
-
-//MARK: - Save photo in gallery function.
-func savePhotoToGallery(dataModel: AppModel) {
-//    let rotatedImage = dataModel.image?.rotate(byDegrees: 45)
-//    let rotatedImage = 
-    let adjustedImageWithAspectRatio = dataModel.image!.drawOnContext(dataModel: dataModel, contextSize: CGSize(width: 1000, height: 1000))
-    // Save the adjusted image to the Camera Roll
-    UIImageWriteToSavedPhotosAlbum(adjustedImageWithAspectRatio!, nil, nil, nil)
-}
 //MARK: - End Save Photo gallery  function.
+
+func flipImage(image: UIImage) -> UIImage? {
+    // Convert the UIImage to a CIImage
+    guard let ciImage = CIImage(image: image) else {
+        return nil
+    }
+
+    // Flip the image horizontally using a transformation
+    let flippedImage = ciImage.transformed(by: CGAffineTransform(scaleX: -1.0, y: 1.0))
+
+    // Create a new UIImage from the flipped CIImage
+    let context = CIContext(options: nil)
+    guard let cgImage = context.createCGImage(flippedImage, from: flippedImage.extent) else {
+        return nil
+    }
+
+    let flippedUIImage = UIImage(cgImage: cgImage, scale: image.scale, orientation: image.imageOrientation)
+
+    return flippedUIImage
+}
 
 extension UIImage {
         func imageFlippedHorizontally(_ flipped: Bool) -> UIImage {
@@ -27,36 +39,6 @@ extension UIImage {
                 return self
             }
         }
-    
-//    func rotate(byDegrees degrees: CGFloat) -> UIImage? {
-//        // Convert degrees to radians
-//        let radians = degrees * CGFloat.pi / 180.0
-//        
-//        // Calculate the size of the rotated image
-//        let rotatedSize = CGRect(origin: .zero, size: size)
-//            .applying(CGAffineTransform(rotationAngle: radians))
-//            .integral.size
-//        
-//        // Create the rotated image context
-//        UIGraphicsBeginImageContext(rotatedSize)
-//        
-//        if let context = UIGraphicsGetCurrentContext() {
-//            // Move the origin to the middle of the image so it rotates around its center
-//            context.translateBy(x: rotatedSize.width / 2, y: rotatedSize.height / 2)
-//            // Rotate the context
-//            context.rotate(by: radians)
-//            // Draw the image
-//            draw(in: CGRect(x: -size.width / 2, y: -size.height / 2, width: size.width, height: size.height))
-//            // Get the rotated image from the context
-//            let rotatedImage = UIGraphicsGetImageFromCurrentImageContext()
-//            // End the image context
-//            UIGraphicsEndImageContext()
-//            
-//            return rotatedImage
-//        }
-//        
-//        return nil
-//    }
        
     func drawOnContext(dataModel: AppModel, contextSize: CGSize) -> UIImage? {
         let aspectRatio: CGFloat = (dataModel.opacityRatio?.aspectRatio)!
@@ -73,7 +55,7 @@ extension UIImage {
         }
 
         // Fill the context with the background color (red in this case).
-        context.setFillColor(UIColor.red.cgColor)
+        context.setFillColor(UIColor(named: "SecondaryColor")!.cgColor)
         context.fill(CGRect(origin: .zero, size: targetSize))
 
         context.saveGState()
@@ -84,52 +66,47 @@ extension UIImage {
             newParentSize: targetSize
         )
         var imageCenter = CGPoint.zero
-//        if(dataModel.scale != 1.0){
-//            imageCenter =  reCalculateCenterForScale(CGPoint(x: dataModel.centerX!, y: dataModel.centerY!),
-//                                                     originalSize: dataModel.referenceSize!, scaleFactor: scale,
-//                                                      newSize: targetSize)
-//
-//        }
-//        else{
-            imageCenter = reCalculateCenter(
-                CGPoint(x: dataModel.centerX!, y: dataModel.centerY!),
-                currentSize: dataModel.referenceSize!,
-                newSize: targetSize
-            )
-     //   }
-
-        // JD NEESHU WE PUCKING FLIPPED IT 
-        
-        // Flip the context horizontally or vertically as needed
-     //   if (dataModel.imageFlipData?.horizontally)! {
-            //  Translate the context to the center of the image
-        context.translateBy(x: dataModel.imageFlipData!.horizontally ? imageSize.width + imageCenter.x : 0, y: dataModel.imageFlipData!.vertically ?  imageSize.height + imageCenter.y: 0)
-            context.scaleBy(x: dataModel.imageFlipData!.horizontally ? -1 : 1, y: dataModel.imageFlipData!.vertically ? -1 : 1)
-            
-//        }
-//
-//        if (dataModel.imageFlipData?.vertically)! {
-//            //  Translate the context to the center of the image
-//            context.translateBy(x: 0, y: targetSize.height)
-//            context.scaleBy(x: 1, y: -1)
-//        }
-        //  Translate the context to the center of the image
-        //context.translateBy(x: -imageCenter.x, y: -imageCenter.y)
+        imageCenter = reCalculateCenter(
+            CGPoint(x: dataModel.centerX!, y: dataModel.centerY!),
+            currentSize: dataModel.referenceSize!,
+            newSize: targetSize
+        )
         if dataModel.imageFlipData?.radian != 0.0 {
+            //  Translate the context to the center of the image
+            context.translateBy(x: imageCenter.x, y: imageCenter.y)
             // Apply the rotation transform to the context
             let angleInRadians = dataModel.imageFlipData?.radian
             context.rotate(by: angleInRadians!)
         }
 
         // Draw the original image on the context with adjusted opacity
-        let imageRect = CGRect(x: imageSize.width / 2, y: imageSize.height / 2, width: imageSize.width, height: imageSize.height)
+        var imageRect = CGRect()
+        if(dataModel.imageFlipData?.radian == 0.0 || dataModel.scale != 1.0){
+            
+            imageRect = CGRect(x: imageCenter.x - imageSize.width / 2, y: imageCenter.y - imageSize.height / 2, width: imageSize.width, height: imageSize.height)
+        }
+        else{
+            imageRect = CGRect(x: -imageSize.width / 2, y: -imageSize.height / 2, width: imageSize.width, height: imageSize.height)
+        }
         self.draw(in: imageRect)
-        context.restoreGState()
+        if(dataModel.imageFlipData?.radian != 1.0){
+            context.restoreGState()
+        }
+
+
+        context.setShouldAntialias(true)
         // Add border to the adjusted image
         let borderPath = UIBezierPath(rect: CGRect(origin: .zero, size: targetSize))
         dataModel.borderPanelData.borderColor.setStroke()
-        print(dataModel.borderPanelData.borderColor)
-        borderPath.lineWidth = (dataModel.borderPanelData.borderWidth)
+        var borderWidth : CGFloat
+        if(targetSize.width > targetSize.height){
+             borderWidth = (targetSize.height) * (dataModel.borderPanelData.borderWidth)/100
+        }
+        else{
+            borderWidth = (targetSize.width)*(dataModel.borderPanelData.borderWidth)/100
+        }
+            
+        borderPath.lineWidth = borderWidth
         borderPath.stroke()
 
         let finalImage = UIGraphicsGetImageFromCurrentImageContext()

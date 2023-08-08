@@ -3,6 +3,7 @@
     <device id="retina6_12" orientation="portrait" appearance="light"/>
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21505"/>
+        <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -13,6 +14,7 @@
                 <outlet property="DoneButton" destination="NrB-3w-mFZ" id="R2A-Ho-mco"/>
                 <outlet property="cancelButton" destination="r8Q-0l-S3X" id="zWL-R1-hZx"/>
                 <outlet property="horizontalFlipButton" destination="mzR-Vm-IGI" id="hdz-Pe-Qwy"/>
+                <outlet property="minSliderLabel" destination="w33-rO-yAp" id="o26-Jp-F6H"/>
                 <outlet property="rotationSlider" destination="sRn-a6-J0Q" id="xdq-QZ-Omy"/>
                 <outlet property="verticalFlipButton" destination="duh-2H-7Sk" id="pah-ue-88h"/>
                 <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
@@ -29,20 +31,84 @@
                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="jYh-1E-mTw" userLabel="SliderView">
                             <rect key="frame" x="0.0" y="0.0" width="393" height="253"/>
                             <subviews>
-                                <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.5" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="sRn-a6-J0Q">
-                                    <rect key="frame" x="17.666666666666657" y="0.0" width="357.66666666666674" height="254"/>
-                                    <color key="minimumTrackTintColor" systemColor="secondarySystemBackgroundColor"/>
-                                    <color key="maximumTrackTintColor" systemColor="opaqueSeparatorColor"/>
-                                    <connections>
-                                        <action selector="didChangeRotation:" destination="-1" eventType="valueChanged" id="Anb-il-kCK"/>
-                                    </connections>
-                                </slider>
+                                <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="ZAV-kR-Dbx">
+                                    <rect key="frame" x="0.0" y="0.0" width="393" height="253"/>
+                                    <subviews>
+                                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="OpM-jM-Y2O">
+                                            <rect key="frame" x="0.0" y="0.0" width="393" height="20"/>
+                                            <subviews>
+                                                <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" translatesAutoresizingMaskIntoConstraints="NO" id="CS2-2F-HRD">
+                                                    <rect key="frame" x="0.0" y="0.0" width="393" height="20"/>
+                                                    <subviews>
+                                                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="oRR-wp-roY">
+                                                            <rect key="frame" x="0.0" y="0.0" width="196.66666666666666" height="20"/>
+                                                            <subviews>
+                                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="0" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="w33-rO-yAp">
+                                                                    <rect key="frame" x="28.666666666666671" y="1.6666666666666643" width="9" height="17"/>
+                                                                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                                                    <color key="textColor" name="DefaultColor"/>
+                                                                    <nil key="highlightedColor"/>
+                                                                </label>
+                                                            </subviews>
+                                                            <constraints>
+                                                                <constraint firstItem="w33-rO-yAp" firstAttribute="centerX" secondItem="oRR-wp-roY" secondAttribute="centerX" constant="-65" id="5p4-bF-Dui"/>
+                                                                <constraint firstItem="w33-rO-yAp" firstAttribute="centerY" secondItem="oRR-wp-roY" secondAttribute="centerY" id="OHY-xs-cth"/>
+                                                            </constraints>
+                                                        </view>
+                                                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="52Q-7n-x5f">
+                                                            <rect key="frame" x="196.66666666666663" y="0.0" width="196.33333333333337" height="20"/>
+                                                            <subviews>
+                                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="360" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="9oe-lC-La3">
+                                                                    <rect key="frame" x="145.00000000000003" y="1.6666666666666643" width="26.333333333333343" height="17"/>
+                                                                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                                                    <color key="textColor" name="DefaultColor"/>
+                                                                    <nil key="highlightedColor"/>
+                                                                </label>
+                                                            </subviews>
+                                                            <constraints>
+                                                                <constraint firstItem="9oe-lC-La3" firstAttribute="centerY" secondItem="52Q-7n-x5f" secondAttribute="centerY" id="PeN-iN-J4d"/>
+                                                                <constraint firstItem="9oe-lC-La3" firstAttribute="centerX" secondItem="52Q-7n-x5f" secondAttribute="centerX" constant="60" id="ift-wB-tT9"/>
+                                                            </constraints>
+                                                        </view>
+                                                    </subviews>
+                                                </stackView>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="CS2-2F-HRD" firstAttribute="height" secondItem="OpM-jM-Y2O" secondAttribute="height" id="9lO-Pb-Eaf"/>
+                                                <constraint firstItem="CS2-2F-HRD" firstAttribute="centerX" secondItem="OpM-jM-Y2O" secondAttribute="centerX" id="G0z-o6-Weq"/>
+                                                <constraint firstItem="CS2-2F-HRD" firstAttribute="centerY" secondItem="OpM-jM-Y2O" secondAttribute="centerY" id="Whl-lJ-oUE"/>
+                                                <constraint firstAttribute="height" constant="20" id="XGV-3f-ERW"/>
+                                                <constraint firstItem="CS2-2F-HRD" firstAttribute="width" secondItem="OpM-jM-Y2O" secondAttribute="width" id="fb8-Xa-q77"/>
+                                            </constraints>
+                                        </view>
+                                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Nla-Gh-sbO">
+                                            <rect key="frame" x="0.0" y="20" width="393" height="233"/>
+                                            <subviews>
+                                                <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.5" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="sRn-a6-J0Q">
+                                                    <rect key="frame" x="17.666666666666657" y="77" width="357.66666666666674" height="80"/>
+                                                    <color key="minimumTrackTintColor" name="ThemeColor"/>
+                                                    <color key="maximumTrackTintColor" systemColor="opaqueSeparatorColor"/>
+                                                    <color key="thumbTintColor" name="ThemeColor"/>
+                                                    <connections>
+                                                        <action selector="didChangeRotation:" destination="-1" eventType="valueChanged" id="Anb-il-kCK"/>
+                                                    </connections>
+                                                </slider>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="sRn-a6-J0Q" firstAttribute="centerY" secondItem="Nla-Gh-sbO" secondAttribute="centerY" id="5dr-7O-6EC"/>
+                                                <constraint firstItem="sRn-a6-J0Q" firstAttribute="height" secondItem="Nla-Gh-sbO" secondAttribute="height" multiplier="0.34" id="Ip9-kh-dhl"/>
+                                                <constraint firstItem="sRn-a6-J0Q" firstAttribute="width" secondItem="Nla-Gh-sbO" secondAttribute="width" multiplier="0.899915" id="Oci-6P-Ua2"/>
+                                                <constraint firstItem="sRn-a6-J0Q" firstAttribute="centerX" secondItem="Nla-Gh-sbO" secondAttribute="centerX" id="zeE-kg-eet"/>
+                                            </constraints>
+                                        </view>
+                                    </subviews>
+                                </stackView>
                             </subviews>
                             <constraints>
-                                <constraint firstItem="sRn-a6-J0Q" firstAttribute="width" secondItem="jYh-1E-mTw" secondAttribute="width" multiplier="0.9" id="2Cn-Hz-kAf"/>
-                                <constraint firstItem="sRn-a6-J0Q" firstAttribute="centerY" secondItem="jYh-1E-mTw" secondAttribute="centerY" id="Cgd-ar-2eV"/>
-                                <constraint firstItem="sRn-a6-J0Q" firstAttribute="centerX" secondItem="jYh-1E-mTw" secondAttribute="centerX" id="Kb3-Q8-5xn"/>
-                                <constraint firstItem="sRn-a6-J0Q" firstAttribute="height" secondItem="jYh-1E-mTw" secondAttribute="height" id="RhF-Rm-hQt"/>
+                                <constraint firstItem="ZAV-kR-Dbx" firstAttribute="centerX" secondItem="jYh-1E-mTw" secondAttribute="centerX" id="1D6-Wm-cga"/>
+                                <constraint firstItem="ZAV-kR-Dbx" firstAttribute="height" secondItem="jYh-1E-mTw" secondAttribute="height" id="7uu-0Z-HJW"/>
+                                <constraint firstItem="ZAV-kR-Dbx" firstAttribute="centerY" secondItem="jYh-1E-mTw" secondAttribute="centerY" id="eNI-tg-qeU"/>
+                                <constraint firstItem="ZAV-kR-Dbx" firstAttribute="width" secondItem="jYh-1E-mTw" secondAttribute="width" id="oZf-F5-6CJ"/>
                             </constraints>
                         </view>
                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="i8p-oW-k4c" userLabel="FlipButtonView">
@@ -59,7 +125,7 @@
                                                     <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                     <state key="normal" title="Button"/>
                                                     <buttonConfiguration key="configuration" style="plain" title="Horizontal">
-                                                        <color key="baseForegroundColor" red="0.031236654230000001" green="0.031545928030000003" blue="0.031545928030000003" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+                                                        <color key="baseForegroundColor" name="ThemeColor"/>
                                                     </buttonConfiguration>
                                                     <connections>
                                                         <action selector="didChangeHorizontalFlip:" destination="-1" eventType="touchUpInside" id="T96-No-WQ7"/>
@@ -80,7 +146,7 @@
                                                     <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                     <state key="normal" title="Button"/>
                                                     <buttonConfiguration key="configuration" style="plain" title="Vertical">
-                                                        <color key="baseForegroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                        <color key="baseForegroundColor" name="ThemeColor"/>
                                                     </buttonConfiguration>
                                                     <connections>
                                                         <action selector="didChangeVerticalFlip:" destination="-1" eventType="touchUpInside" id="1FX-HY-GBA"/>
@@ -113,11 +179,10 @@
                                             <rect key="frame" x="0.0" y="0.0" width="196.66666666666666" height="253"/>
                                             <subviews>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="r8Q-0l-S3X">
-                                                    <rect key="frame" x="48.999999999999993" y="109.33333333333337" width="98.333333333333314" height="34.333333333333343"/>
-                                                    <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                    <rect key="frame" x="4" y="114.33333333333336" width="98.333333333333329" height="34.333333333333329"/>
                                                     <state key="normal" title="Button"/>
                                                     <buttonConfiguration key="configuration" style="plain" title="Cancel">
-                                                        <color key="baseForegroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                        <color key="baseForegroundColor" name="ThemeColor"/>
                                                     </buttonConfiguration>
                                                     <connections>
                                                         <action selector="didCancelButtonClicked:" destination="-1" eventType="touchUpInside" id="Jwu-XA-3wp"/>
@@ -125,8 +190,8 @@
                                                 </button>
                                             </subviews>
                                             <constraints>
-                                                <constraint firstItem="r8Q-0l-S3X" firstAttribute="centerY" secondItem="nv5-NT-2EJ" secondAttribute="centerY" id="S5V-px-tYX"/>
-                                                <constraint firstItem="r8Q-0l-S3X" firstAttribute="centerX" secondItem="nv5-NT-2EJ" secondAttribute="centerX" id="Z01-cD-m4B"/>
+                                                <constraint firstItem="r8Q-0l-S3X" firstAttribute="centerY" secondItem="nv5-NT-2EJ" secondAttribute="centerY" constant="5" id="S5V-px-tYX"/>
+                                                <constraint firstItem="r8Q-0l-S3X" firstAttribute="centerX" secondItem="nv5-NT-2EJ" secondAttribute="centerX" constant="-45" id="Z01-cD-m4B"/>
                                                 <constraint firstItem="r8Q-0l-S3X" firstAttribute="width" secondItem="nv5-NT-2EJ" secondAttribute="width" multiplier="0.5" id="emX-nH-lec"/>
                                             </constraints>
                                         </view>
@@ -134,11 +199,10 @@
                                             <rect key="frame" x="196.66666666666663" y="0.0" width="196.33333333333337" height="253"/>
                                             <subviews>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="NrB-3w-mFZ">
-                                                    <rect key="frame" x="48.999999999999993" y="109.33333333333337" width="98.333333333333314" height="34.333333333333343"/>
-                                                    <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                    <rect key="frame" x="94.000000000000028" y="114.33333333333336" width="98.333333333333343" height="34.333333333333329"/>
                                                     <state key="normal" title="Button"/>
                                                     <buttonConfiguration key="configuration" style="plain" title="Done">
-                                                        <color key="baseForegroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                        <color key="baseForegroundColor" name="ThemeColor"/>
                                                     </buttonConfiguration>
                                                     <connections>
                                                         <action selector="didDoneButtonClicked:" destination="-1" eventType="touchUpInside" id="v5Z-nD-hKR"/>
@@ -146,9 +210,9 @@
                                                 </button>
                                             </subviews>
                                             <constraints>
-                                                <constraint firstItem="NrB-3w-mFZ" firstAttribute="centerY" secondItem="A9J-HQ-pbH" secondAttribute="centerY" id="MQa-k4-6YK"/>
+                                                <constraint firstItem="NrB-3w-mFZ" firstAttribute="centerY" secondItem="A9J-HQ-pbH" secondAttribute="centerY" constant="5" id="MQa-k4-6YK"/>
                                                 <constraint firstItem="NrB-3w-mFZ" firstAttribute="width" secondItem="A9J-HQ-pbH" secondAttribute="width" multiplier="0.5" id="SBO-qR-iwA"/>
-                                                <constraint firstItem="NrB-3w-mFZ" firstAttribute="centerX" secondItem="A9J-HQ-pbH" secondAttribute="centerX" id="gaC-SD-Yhk"/>
+                                                <constraint firstItem="NrB-3w-mFZ" firstAttribute="centerX" secondItem="A9J-HQ-pbH" secondAttribute="centerX" constant="45" id="gaC-SD-Yhk"/>
                                             </constraints>
                                         </view>
                                     </subviews>
@@ -165,7 +229,6 @@
                 </stackView>
             </subviews>
             <viewLayoutGuide key="safeArea" id="fnl-2z-Ty3"/>
-            <color key="backgroundColor" red="0.63982705959999997" green="0.82258128159999999" blue="0.80869873560000005" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
             <constraints>
                 <constraint firstItem="MAb-4h-aCw" firstAttribute="centerY" secondItem="fnl-2z-Ty3" secondAttribute="centerY" id="4iP-PS-oRt"/>
                 <constraint firstItem="MAb-4h-aCw" firstAttribute="centerX" secondItem="fnl-2z-Ty3" secondAttribute="centerX" id="ARX-jP-CoW"/>
@@ -176,11 +239,14 @@
         </view>
     </objects>
     <resources>
+        <namedColor name="DefaultColor">
+            <color red="0.42276278409090906" green="0.42276278409090906" blue="0.42276278409090906" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+        </namedColor>
+        <namedColor name="ThemeColor">
+            <color red="0.70988744497299194" green="0.17216901481151581" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+        </namedColor>
         <systemColor name="opaqueSeparatorColor">
             <color red="0.77647058823529413" green="0.77647058823529413" blue="0.78431372549019607" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-        </systemColor>
-        <systemColor name="secondarySystemBackgroundColor">
-            <color red="0.94901960784313721" green="0.94901960784313721" blue="0.96862745098039216" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>

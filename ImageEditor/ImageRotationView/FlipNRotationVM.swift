@@ -2,8 +2,16 @@ import UIKit
 
 class FlipNRotationVM{
     var dataModel : ImageFlipModel
+    var prevDataModel : ImageFlipModel
+    var onBindRotation: ((CGFloat?)->())?
     init(dataModel: ImageFlipModel) {
         self.dataModel = dataModel
+        self.prevDataModel = dataModel
+    }
+    
+    func updateCurrentModelToPreviousModel(){
+        dataModel = prevDataModel
+        onBindRotation?(dataModel.radian)
     }
     func getDataModel()->ImageFlipModel{
         return dataModel
@@ -26,6 +34,7 @@ class FlipNRotationVM{
     }
     func updateRotation(radian : CGFloat){
         dataModel.radian = radian
+        onBindRotation?(radian)
     }
     
 }

@@ -146,7 +146,6 @@
 				F72765FB2A77AFA70048C5D4 /* HomeScreen */,
 				F7275A132A6FA4D600F2D20B /* AppDelegate.swift */,
 				F7275A152A6FA4D600F2D20B /* SceneDelegate.swift */,
-				F7275A192A6FA4D600F2D20B /* Main.storyboard */,
 				F7275A1C2A6FA4D700F2D20B /* Assets.xcassets */,
 				F7275A1E2A6FA4D700F2D20B /* LaunchScreen.storyboard */,
 				F7275A212A6FA4D700F2D20B /* Info.plist */,
@@ -176,6 +175,7 @@
 			children = (
 				F7275A172A6FA4D600F2D20B /* HomeScreenVC.swift */,
 				F7275A472A6FA64100F2D20B /* HomeScreenVM.swift */,
+				F7275A192A6FA4D600F2D20B /* Main.storyboard */,
 			);
 			path = HomeScreen;
 			sourceTree = "<group>";
@@ -581,8 +581,10 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = A3C2DQ9TYS;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ImageEditor/Info.plist;
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "[Explanation of why the app needs access to the photo library]";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
@@ -608,8 +610,10 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = A3C2DQ9TYS;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ImageEditor/Info.plist;
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "[Explanation of why the app needs access to the photo library]";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;

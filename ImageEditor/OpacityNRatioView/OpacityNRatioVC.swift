@@ -14,7 +14,9 @@ class OpacityNRatioVC: UIViewController {
     
     @IBOutlet var cancelButton: UIButton!
     @IBOutlet var doneButton: UIButton!
+    @IBOutlet var minSliderLabel: UILabel!
     var color : UIColor?
+    var prevCell: AspectRatioCell?
     var editorDelegate : EditorDelegate?
     var viewModel : OpacityNRatioVM
     init(viewModel: OpacityNRatioVM) {
@@ -36,10 +38,9 @@ class OpacityNRatioVC: UIViewController {
         collectionView.dataSource = self
         // Assuming you have a reference to your collection view
         collectionView.register(UINib(nibName: "AspectRatioCell", bundle: nil), forCellWithReuseIdentifier: "AspectRatioCell")
-        opacitySlider.thumbTintColor = .black
         opacitySlider.maximumValue = 1.0
         opacitySlider.minimumValue = 0.0
-        opacitySlider.tintColor = .white
+        minSliderLabel.text = "0.0"
         opacitySlider.value = Float(viewModel.getOpacity())
         
         cancelButton.layer.cornerRadius = 10
@@ -52,6 +53,7 @@ class OpacityNRatioVC: UIViewController {
     }
     
     @IBAction func didCancelButtonClicked(_ sender: Any) {
+        viewModel.updateCurrentModelToPreviousModel()
         editorDelegate?.didORViewDismissWithoutData()
     }
     
@@ -62,6 +64,7 @@ class OpacityNRatioVC: UIViewController {
         viewModel.onBindOpacity = { [weak self] opacity in
             if let value = opacity{
                 self?.opacitySlider.value = Float(value)
+                self?.minSliderLabel.text =  String(format: "%.2f", Float(value))
             }
         }
     }
@@ -77,19 +80,24 @@ extension OpacityNRatioVC : UICollectionViewDataSource {
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "AspectRatioCell", for: indexPath) as! AspectRatioCell
-        cell.aspectRatioLabel.text = viewModel.getRatioTextForCurrentIndex(index: indexPath.row)
-        if let color = color {
-            cell.backgroundColor = color
-        }
+        let text = viewModel.getRatioTextForCurrentIndex(index: indexPath.row)
+        cell.aspectRatioLabel.text = text
+        cell.backgroundColor = .white
         cell.layer.cornerRadius = 10
+        cell.layer.borderWidth = 4.0
+        cell.layer.borderColor = UIColor(named: "DefaultColor")?.cgColor
+        if(text == "1:1"){
+            cell.layer.borderColor = UIColor(named: "ThemeColor")?.cgColor
+            prevCell = cell
+        }
         return cell
     }
     }
 
 extension OpacityNRatioVC : UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let width : CGFloat =  90
-        let height : CGFloat = 80
+        let width : CGFloat =  80
+        let height : CGFloat = 40
         return CGSize(width: width, height: height)
 
 
@@ -99,7 +107,9 @@ extension OpacityNRatioVC : UICollectionViewDelegateFlowLayout {
 extension OpacityNRatioVC : UICollectionViewDelegate{
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let selectedCell = collectionView.cellForItem(at: indexPath) as? AspectRatioCell
-
+        selectedCell!.layer.borderColor = UIColor(named: "ThemeColor")?.cgColor
+        prevCell?.layer.borderColor =  UIColor(named: "DefaultColor")?.cgColor
+        prevCell = selectedCell
         // Access the text property of the selected cell
         let selectedText = selectedCell?.aspectRatioLabel.text
         let aspectRatioValue = viewModel.getRatioValueForCurrentIndex(selectedRatio: selectedText!)
